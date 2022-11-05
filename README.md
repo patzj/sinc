@@ -1,1 +1,5 @@
-# network-calculator
+# Network Calculator
+
+```sh
+go run .
+```
