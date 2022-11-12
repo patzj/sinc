@@ -32,22 +32,22 @@ func NewIPv4(ipv4Str string) (*IPv4, error) {
 	return &IPv4{octets}, nil
 }
 
-type SubnetMask struct {
+type Netmask struct {
 	cidr uint8
 	mask [4]uint8
 	bits [4][8]uint8
 }
 
-func NewSubnetMask(subnetMaskStr string) (*SubnetMask, error) {
+func NewNetmask(cidrStr string) (*Netmask, error) {
 	// Syntactic validation
-	subnetMaskPattern := `^\d{1,2}$`
-	if matched, _ := regexp.MatchString(subnetMaskPattern, subnetMaskStr); !matched {
+	cidrPattern := `^\d{1,2}$`
+	if matched, _ := regexp.MatchString(cidrPattern, cidrStr); !matched {
 		return nil, errors.New("invalid subnet")
 	}
 
 	// Symantic validation
 	var cidr uint8
-	if n, _ := strconv.Atoi(subnetMaskStr); 0 <= n && n <= 32 {
+	if n, _ := strconv.Atoi(cidrStr); 0 <= n && n <= 32 {
 		cidr = uint8(n)
 	} else {
 		return nil, errors.New("invalid subnet")
@@ -71,5 +71,5 @@ func NewSubnetMask(subnetMaskStr string) (*SubnetMask, error) {
 		mask[i] = uint8(value)
 	}
 
-	return &SubnetMask{cidr, mask, bits}, nil
+	return &Netmask{cidr, mask, bits}, nil
 }
