@@ -2,7 +2,8 @@ package main
 
 import (
 	"fmt"
-	"regexp"
+
+	"github.com/patzj/network-calculator/models"
 )
 
 func printIpV4SubnetHeader() {
@@ -12,18 +13,25 @@ func printIpV4SubnetHeader() {
 }
 
 func promptIpV4SubnetInput() {
-	ipv4 := ""
+	ipv4Str := ""
 	fmt.Print("Enter IPv4 address (e.g. 192.168.0.1): ")
-	fmt.Scanln(&ipv4)
+	fmt.Scanln(&ipv4Str)
 
-	// Syntactic validation
-	ipv4Pattern := `^(\d{1,3}\.){3}\d{1,3}$`
-	if matched, _ := regexp.MatchString(ipv4Pattern, ipv4); !matched {
-		fmt.Println("Invalid IPv4 address")
-		return
+	ipv4, err := models.NewIPv4(ipv4Str)
+	if err != nil {
+		fmt.Println(err.Error())
 	}
 
-	subnet := ""
-	fmt.Print("Enter subnet mask (1-32): ")
-	fmt.Scanln(&subnet)
+	fmt.Println(ipv4)
+
+	cidrStr := ""
+	fmt.Print("Enter subnet mask (0-32): ")
+	fmt.Scanln(&cidrStr)
+
+	subnet, err := models.NewSubnetMask(cidrStr)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	fmt.Println(subnet)
 }
