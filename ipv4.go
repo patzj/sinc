@@ -22,8 +22,6 @@ func promptIpV4SubnetInput() {
 		fmt.Println(err.Error())
 	}
 
-	fmt.Println(ipv4)
-
 	cidrStr := ""
 	fmt.Print("Enter subnet mask (0-32): ")
 	fmt.Scanln(&cidrStr)
@@ -33,5 +31,5 @@ func promptIpV4SubnetInput() {
 		fmt.Println(err.Error())
 	}
 
-	fmt.Println(netmask)
+	ipv4.Subnet(*netmask)
 }

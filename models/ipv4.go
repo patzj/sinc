@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
@@ -43,4 +44,45 @@ func (ipv4 IPv4) Bits() [4][8]uint8 {
 
 func (ipv4 IPv4) Octets() [4]uint8 {
 	return ipv4.octets
+}
+
+func (ipv4 IPv4) Subnet(netmask Netmask) {
+	octets := ipv4.Octets()
+	for i, octet := range netmask.Octets() {
+		if octet != 255 {
+			octets[i] = 0
+		}
+	}
+
+	networkAddrStr := fmt.Sprintf("%d.%d.%d.%d", octets[0], octets[1], octets[2], octets[3])
+	networkAddr, _ := NewIPv4(networkAddrStr)
+
+	fmt.Println(offset(*networkAddr, 0))
+}
+
+func offset(ipv4 IPv4, n uint) IPv4 {
+	octets := ipv4.Octets()
+	previousOctet := uint(octets[3])
+	previousOctet += n
+
+	pos := cap(octets) - 1
+	for pos >= 0 {
+		octets[pos] = uint8(previousOctet % 256)
+
+		var carry uint
+		if previousOctet > 255 {
+			carry = previousOctet / 256
+		}
+
+		if pos > 0 {
+			previousOctet = uint(octets[pos-1])
+			previousOctet += carry
+		}
+
+		pos--
+	}
+
+	newIpv4Str := fmt.Sprintf("%d.%d.%d.%d", octets[0], octets[1], octets[2], octets[3])
+	newIpv4, _ := NewIPv4(newIpv4Str)
+	return *newIpv4
 }
