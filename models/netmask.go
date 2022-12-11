@@ -2,15 +2,22 @@ package models
 
 import (
 	"errors"
+	"fmt"
 	"math"
 	"regexp"
 	"strconv"
 )
 
+type Octets [4]uint8
+
+func (octets Octets) String() string {
+	return fmt.Sprintf("%d.%d.%d.%d", octets[0], octets[1], octets[2], octets[3])
+}
+
 type Netmask struct {
 	cidr   uint8
 	bits   [4][8]uint8
-	octets [4]uint8
+	octets Octets
 }
 
 func NewNetmask(cidrStr string) (*Netmask, error) {
@@ -35,7 +42,7 @@ func NewNetmask(cidrStr string) (*Netmask, error) {
 	}
 
 	// Get octets
-	octets := [4]uint8{}
+	octets := Octets{}
 	for i, octetBits := range bits {
 		value := 0
 		for power, bit := range octetBits {
@@ -53,6 +60,11 @@ func (netmask Netmask) Bits() [4][8]uint8 {
 	return netmask.bits
 }
 
-func (netmask Netmask) Octets() [4]uint8 {
+func (netmask Netmask) Octets() Octets {
 	return netmask.octets
+}
+
+func (netmask Netmask) Hosts() uint {
+	pow := 32 - netmask.cidr
+	return uint(math.Pow(2, float64(pow)))
 }

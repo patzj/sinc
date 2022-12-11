@@ -11,7 +11,7 @@ import (
 )
 
 type IPv4 struct {
-	octets [4]uint8
+	octets Octets
 	bits   [4][8]uint8
 }
 
@@ -23,7 +23,7 @@ func NewIPv4(ipv4Str string) (*IPv4, error) {
 	}
 
 	// Symantic validation
-	octets := [4]uint8{}
+	octets := Octets{}
 	bits := [4][8]uint8{}
 
 	for i, s := range strings.Split(ipv4Str, ".") {
@@ -42,22 +42,39 @@ func (ipv4 IPv4) Bits() [4][8]uint8 {
 	return ipv4.bits
 }
 
-func (ipv4 IPv4) Octets() [4]uint8 {
+func (ipv4 IPv4) Octets() Octets {
 	return ipv4.octets
 }
 
 func (ipv4 IPv4) Subnet(netmask Netmask) {
-	octets := ipv4.Octets()
+	hostOctetsMin := ipv4.Octets()
+	hostOctetsMax := ipv4.Octets()
+
 	for i, octet := range netmask.Octets() {
 		if octet != 255 {
-			octets[i] = 0
+			hostOctetsMin[i] = 0
+			hostOctetsMax[i] = 255
 		}
 	}
 
-	networkAddrStr := fmt.Sprintf("%d.%d.%d.%d", octets[0], octets[1], octets[2], octets[3])
-	networkAddr, _ := NewIPv4(networkAddrStr)
+	hostAddrMin, _ := NewIPv4(hostOctetsMin.String())
+	hostAddrMax, _ := NewIPv4(hostOctetsMax.String())
 
-	fmt.Println(offset(*networkAddr, 0))
+	hosts := netmask.Hosts()
+	networkAddr := hostAddrMin
+	broadcastAddr := hostAddrMax
+
+	// TODO: Loop until max host address is reached
+
+	for i := 0; i < 4; i++ {
+		*broadcastAddr = offset(*networkAddr, hosts-1)
+
+		fmt.Println("Network", networkAddr.Octets())
+		fmt.Println("Broadcast", broadcastAddr.Octets())
+		fmt.Println()
+
+		*networkAddr = offset(*networkAddr, hosts)
+	}
 }
 
 func offset(ipv4 IPv4, n uint) IPv4 {
