@@ -46,6 +46,33 @@ func (ipv4 IPv4) Octets() Octets {
 	return ipv4.octets
 }
 
+func (ipv4 IPv4) IsBefore(other IPv4) bool {
+	for i, octet := range ipv4.Octets() {
+		if octet > other.octets[i] {
+			return false
+		}
+	}
+	return true
+}
+
+func (ipv4 IPv4) IsAfter(other IPv4) bool {
+	for i, octet := range ipv4.Octets() {
+		if octet < other.octets[i] {
+			return false
+		}
+	}
+	return true
+}
+
+func (ipv4 IPv4) IsEqual(other IPv4) bool {
+	for i, octet := range ipv4.Octets() {
+		if octet != other.octets[i] {
+			return false
+		}
+	}
+	return true
+}
+
 func (ipv4 IPv4) Subnet(netmask Netmask) {
 	hostOctetsMin := ipv4.Octets()
 	hostOctetsMax := ipv4.Octets()
