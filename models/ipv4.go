@@ -73,7 +73,7 @@ func (ipv4 IPv4) IsEqual(other IPv4) bool {
 	return true
 }
 
-func (ipv4 IPv4) Subnet(netmask Netmask) {
+func (ipv4 IPv4) Subnet(netmask Netmask) (*IPv4, *IPv4, error) {
 	hostOctetsMin := ipv4.Octets()
 	hostOctetsMax := ipv4.Octets()
 
@@ -88,19 +88,22 @@ func (ipv4 IPv4) Subnet(netmask Netmask) {
 	hostAddrMax, _ := NewIPv4(hostOctetsMax.String())
 
 	hosts := netmask.Hosts()
-	networkAddr := hostAddrMin
-	broadcastAddr := hostAddrMax
+	networkAddr := *hostAddrMin
 
-	// TODO: Loop until max host address is reached
+	for {
+		if networkAddr.IsAfter(*hostAddrMax) {
+			return nil, nil, errors.New("subnet not found")
+		}
 
-	for i := 0; i < 4; i++ {
-		*broadcastAddr = offset(*networkAddr, hosts-1)
+		broadcastAddr := offset(networkAddr, hosts-1)
+		withinLowerBounds := ipv4.IsAfter(networkAddr) || ipv4.IsEqual(networkAddr)
+		withinUpperBounds := ipv4.IsBefore(broadcastAddr) || ipv4.IsEqual(broadcastAddr)
 
-		fmt.Println("Network", networkAddr.Octets())
-		fmt.Println("Broadcast", broadcastAddr.Octets())
-		fmt.Println()
+		if withinLowerBounds && withinUpperBounds {
+			return &networkAddr, &broadcastAddr, nil
+		}
 
-		*networkAddr = offset(*networkAddr, hosts)
+		networkAddr = offset(networkAddr, hosts)
 	}
 }
 

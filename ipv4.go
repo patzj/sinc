@@ -31,5 +31,6 @@ func promptIpV4SubnetInput() {
 		fmt.Println(err.Error())
 	}
 
-	ipv4.Subnet(*netmask)
+	networkAddr, broadcastAddr, _ := ipv4.Subnet(*netmask)
+	fmt.Println(networkAddr.Octets(), broadcastAddr.Octets())
 }
