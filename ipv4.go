@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/patzj/network-calculator/models"
+	"github.com/patzj/sinc/models"
 )
 
 func printIpV4SubnetHeader() {

@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/patzj/network-calculator/utils"
+	"github.com/patzj/sinc/utils"
 )
 
 type IPv4 struct {
