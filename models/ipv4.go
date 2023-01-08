@@ -22,7 +22,7 @@ func NewIPv4(ipv4Str string) (*IPv4, error) {
 		return nil, errors.New("invalid IPv4 address")
 	}
 
-	// Symantic validation
+	// Semantic validation
 	octets := Octets{}
 	bits := [4][8]uint8{}
 
