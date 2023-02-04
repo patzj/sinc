@@ -35,9 +35,9 @@ Exit:
 }
 
 func printHeader() {
-	fmt.Println("----------------------------------------")
-	fmt.Println("|          Network Calculator          |")
-	fmt.Println("----------------------------------------")
+	fmt.Println("-----------------------------------------------")
+	fmt.Println("|          Simple Network Calculator          |")
+	fmt.Println("-----------------------------------------------")
 }
 
 func printOptions() {

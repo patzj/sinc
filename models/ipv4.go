@@ -6,13 +6,17 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-
-	"github.com/patzj/sinc/utils"
 )
 
 type IPv4 struct {
 	octets Octets
 	bits   [4][8]uint8
+}
+
+type IPv4SubnetResult struct {
+	Network   string   `json:"network"`
+	Broadcast string   `json:"broadcast"`
+	Hosts     []string `json:"hosts"`
 }
 
 func NewIPv4(ipv4Str string) (*IPv4, error) {
@@ -29,7 +33,7 @@ func NewIPv4(ipv4Str string) (*IPv4, error) {
 	for i, s := range strings.Split(ipv4Str, ".") {
 		if n, _ := strconv.Atoi(s); 0 <= n && n <= 255 {
 			octets[i] = uint8(n)
-			bits[i] = utils.OctetBits(octets[i])
+			bits[i] = OctetBits(octets[i])
 		} else {
 			return nil, errors.New("invalid IPv4 address")
 		}
@@ -46,6 +50,7 @@ func (ipv4 IPv4) Octets() Octets {
 	return ipv4.octets
 }
 
+// TODO: Incorrect comparison
 func (ipv4 IPv4) IsBefore(other IPv4) bool {
 	for i, octet := range ipv4.Octets() {
 		if octet > other.octets[i] {
@@ -55,6 +60,7 @@ func (ipv4 IPv4) IsBefore(other IPv4) bool {
 	return true
 }
 
+// TODO: Incorrect comparison
 func (ipv4 IPv4) IsAfter(other IPv4) bool {
 	for i, octet := range ipv4.Octets() {
 		if octet < other.octets[i] {
@@ -95,7 +101,7 @@ func (ipv4 IPv4) Subnet(netmask Netmask) (*IPv4, *IPv4, error) {
 			return nil, nil, errors.New("subnet not found")
 		}
 
-		broadcastAddr := offset(networkAddr, hosts-1)
+		broadcastAddr := Offset(networkAddr, hosts-1)
 		withinLowerBounds := ipv4.IsAfter(networkAddr) || ipv4.IsEqual(networkAddr)
 		withinUpperBounds := ipv4.IsBefore(broadcastAddr) || ipv4.IsEqual(broadcastAddr)
 
@@ -103,11 +109,28 @@ func (ipv4 IPv4) Subnet(netmask Netmask) (*IPv4, *IPv4, error) {
 			return &networkAddr, &broadcastAddr, nil
 		}
 
-		networkAddr = offset(networkAddr, hosts)
+		networkAddr = Offset(networkAddr, hosts)
 	}
 }
 
-func offset(ipv4 IPv4, n uint) IPv4 {
+// * Helper functions
+
+func OctetBits(octet uint8) [8]uint8 {
+	bits := [8]uint8{}
+	pos := cap(bits) - 1
+
+	for pos >= 0 {
+		rem := octet % 2
+		bits[pos] = rem
+
+		pos--
+		octet /= 2
+	}
+
+	return bits
+}
+
+func Offset(ipv4 IPv4, n uint) IPv4 {
 	octets := ipv4.Octets()
 	previousOctet := uint(octets[3])
 	previousOctet += n
