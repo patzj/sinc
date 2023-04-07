@@ -62,7 +62,7 @@ func promptNetmaskInput(netmask *models.Netmask) {
 }
 
 func subnetResult(start, end *models.IPv4) {
-	fmt.Printf("Subnet range: %s - %s\n", start.Octets(), start.Octets())
+	fmt.Printf("Subnet range: %s - %s\n", start.Octets(), end.Octets())
 
 	for {
 		fmt.Println("0 - Main menu")
