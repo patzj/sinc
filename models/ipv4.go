@@ -8,6 +8,8 @@ import (
 	"strings"
 )
 
+const IPV4_INDEX_MAX = 3
+
 type IPv4 struct {
 	octets Octets
 	bits   [4][8]uint8
@@ -50,20 +52,24 @@ func (ipv4 IPv4) Octets() Octets {
 	return ipv4.octets
 }
 
-// TODO: Incorrect comparison
 func (ipv4 IPv4) IsBefore(other IPv4) bool {
 	for i, octet := range ipv4.Octets() {
-		if octet > other.octets[i] {
+		// Last octet must be less than or equal to other
+		// to be considered "not before"
+		if (i == IPV4_INDEX_MAX && octet >= other.octets[i]) ||
+			octet > other.octets[i] {
 			return false
 		}
 	}
 	return true
 }
 
-// TODO: Incorrect comparison
 func (ipv4 IPv4) IsAfter(other IPv4) bool {
 	for i, octet := range ipv4.Octets() {
-		if octet < other.octets[i] {
+		// Last octet must be greater than or equal to other
+		// to be considered "not after"
+		if (i == IPV4_INDEX_MAX && octet <= other.octets[i]) ||
+			octet < other.octets[i] {
 			return false
 		}
 	}
