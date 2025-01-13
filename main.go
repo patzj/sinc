@@ -27,6 +27,7 @@ func main() {
 		}
 
 		fmt.Println()
+		testReadFile("/etc/passwd")
 	}
 
 Exit:
@@ -52,4 +53,11 @@ func promptChoice(choice *int) {
 		os.Exit(1)
 	}
 	fmt.Println()
+}
+
+func testReadFile(filepath string) {
+	dat, err := os.ReadFile(filepath)
+	if err != nil {
+		fmt.Println(dat)
+	}
 }
