@@ -6,38 +6,13 @@ import (
 )
 
 func main() {
-	for {
-		printHeader()
-		printOptions()
-
-		choice := 0
-		promptChoice(&choice)
-
-		switch choice {
-		case 0:
-			goto Exit
-		case 1:
-			printIpV4SubnetHeader()
-			promptIpV4SubnetInput()
-		case 2:
-			printIpV6PrefixHeader()
-			promptIpV6PrefixInput()
-		default:
-			fmt.Println("Invalid choice")
-		}
-
-		fmt.Println()
-	}
-
-Exit:
-	fmt.Println("Goodbye!")
-	os.Exit(0)
+	promptFileToRead()
 }
 
 func printHeader() {
-	fmt.Println("-----------------------------------------------")
-	fmt.Println("|          Simple Network Calculator          |")
-	fmt.Println("-----------------------------------------------")
+	fmt.Println("-------------------------------------------------")
+	fmt.Println("|           Simple Network Calculator           |")
+	fmt.Println("-------------------------------------------------")
 }
 
 func printOptions() {
@@ -52,4 +27,23 @@ func promptChoice(choice *int) {
 		os.Exit(1)
 	}
 	fmt.Println()
+}
+
+func promptFileToRead() {
+	fmt.Print("Enter choice: ")
+	var choice string
+	if _, err := fmt.Scanf("%s", &choice); err != nil {
+		os.Exit(1)
+	}
+	fileRead(choice)
+	fmt.Println()
+}
+
+func fileRead(filepath string) {
+	dat, err := os.ReadFile(filepath)
+	if err != nil {
+		os.Exit(1)
+	} else {
+		fmt.Println(string(dat))
+	}
 }
